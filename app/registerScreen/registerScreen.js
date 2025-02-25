@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
 import MyButton from '../components/MyButton';
+import { register } from '../access/methods';
 
 const RegisterScreen = ({ navigation }) => {
     const registerSchema = Yup.object().shape({
@@ -14,7 +15,7 @@ const RegisterScreen = ({ navigation }) => {
             .required('El correo es requerido'),
         clave: Yup.string()
             .required('La clave es requerida')
-            .min(6, 'La clave debe tener al menos 6 caracteres'),
+            .min(8, "La clave debe tener al menos 8 caracteres")
     });
 
     const { control, handleSubmit, formState: { errors } } = useForm({
@@ -22,7 +23,26 @@ const RegisterScreen = ({ navigation }) => {
     });
 
     const onSubmit = (data) => {
-        console.log(data);
+        const submit_data=
+            {
+                "user": {
+                    "nombres": data.nombres,
+                    "apellidos": data.apellidos,
+                },
+                "cuenta": {
+                    "correo": data.correo,
+                    "clave": data.clave
+                }
+            }
+        
+        register(submit_data).then((response) => {
+            if (response.code === 201) {
+                alert('Usuario registrado correctamente');
+                navigation.navigate('Login');
+            } else {
+                alert('Error al registrar usuario');
+            }
+        });
     };
 
     return (

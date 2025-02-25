@@ -4,7 +4,8 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
 import MyButton from '../components/MyButton';
-
+import { login } from '../access/methods';
+import { storeSession } from '../access/session';
 export const { width, height } = Dimensions.get('window');
 
 const LoginScreen = ({ navigation }) => {
@@ -17,8 +18,19 @@ const LoginScreen = ({ navigation }) => {
         resolver: yupResolver(loginSchema),
     });
 
-    const onSubmit = (data) => {
-        console.log(data);
+    const onSubmit = async (data) => {
+        await login(data.correo, data.clave).then((response) => {
+            if (response.code === 200) {
+                storeSession(response.data.access_token).then(() => {
+                    console.log('Sesión guardada');
+                    alert('Inicio de sesión correcto');
+                    navigation.replace('Home');
+                });
+                
+            } else {
+                alert('Correo o clave incorrectos');
+            }
+        });
     };
 
     return (
