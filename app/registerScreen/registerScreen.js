@@ -26,110 +26,123 @@ const RegisterScreen = ({ navigation }) => {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.titleContainer}>
-                <Text style={styles.title}>Registrarse</Text>
-            </View>
+        <View style={styles.mainContainer}>
+            <ScrollView contentContainerStyle={styles.container}>
+                <View style={styles.titleContainer}>
+                    <Text style={styles.title}>Registrate Aquí!</Text>
+                </View>
 
-            <View style={styles.inputContainer}>
-                <Text style={styles.text}>Nombres:</Text>
-                <Controller
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            style={styles.input}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            value={value}
-                        />
-                    )}
-                    name="nombres"
-                    defaultValue=""
-                />
-                {errors.nombres && <Text style={styles.error}>{errors.nombres.message}</Text>}
-            </View>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.text}>Nombres:</Text>
+                    <Controller
+                        control={control}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                style={styles.input}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                            />
+                        )}
+                        name="nombres"
+                        defaultValue=""
+                    />
+                    {errors.nombres && <Text style={styles.error}>{errors.nombres.message}</Text>}
+                </View>
 
-            <View style={styles.inputContainer}>
-                <Text style={styles.text}>Apellidos:</Text>
-                <Controller
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            style={styles.input}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            value={value}
-                        />
-                    )}
-                    name="apellidos"
-                    defaultValue=""
-                />
-                {errors.apellidos && <Text style={styles.error}>{errors.apellidos.message}</Text>}
-            </View>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.text}>Apellidos:</Text>
+                    <Controller
+                        control={control}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                style={styles.input}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                            />
+                        )}
+                        name="apellidos"
+                        defaultValue=""
+                    />
+                    {errors.apellidos && <Text style={styles.error}>{errors.apellidos.message}</Text>}
+                </View>
 
-            <View style={styles.inputContainer}>
-                <Text style={styles.text}>Correo electrónico:</Text>
-                <Controller
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            style={styles.input}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            value={value}
-                            keyboardType="email-address"
-                        />
-                    )}
-                    name="correo"
-                    defaultValue=""
-                />
-                {errors.correo && <Text style={styles.error}>{errors.correo.message}</Text>}
-            </View>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.text}>Correo electrónico:</Text>
+                    <Controller
+                        control={control}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                style={styles.input}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                                keyboardType="email-address"
+                            />
+                        )}
+                        name="correo"
+                        defaultValue=""
+                    />
+                    {errors.correo && <Text style={styles.error}>{errors.correo.message}</Text>}
+                </View>
 
-            <View style={styles.inputContainer}>
-                <Text style={styles.text}>Clave:</Text>
-                <Controller
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            style={styles.input}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            value={value}
-                            secureTextEntry
-                        />
-                    )}
-                    name="clave"
-                    defaultValue=""
-                />
-                {errors.clave && <Text style={styles.error}>{errors.clave.message}</Text>}
-            </View>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.text}>Clave:</Text>
+                    <Controller
+                        control={control}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                style={styles.input}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                                secureTextEntry
+                            />
+                        )}
+                        name="clave"
+                        defaultValue=""
+                    />
+                    {errors.clave && <Text style={styles.error}>{errors.clave.message}</Text>}
+                </View>
 
-            <View style={{ marginTop: 20 }}>
-                <MyButton title="Registrarse" onPress={handleSubmit(onSubmit)} />
-                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                    <Text style={styles.linkText}>¿Ya tienes una cuenta? Inicia sesión aquí</Text>
-                </TouchableOpacity>
-            </View>
-        </ScrollView>
+                <View style={{ marginTop: 20 }}>
+                    <MyButton title="Registrarse" onPress={handleSubmit(onSubmit)} />
+                    <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                        <Text style={styles.linkText}>¿Ya tienes una cuenta? Inicia sesión aquí</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        display: 'flex',
+        flex: 1,
+        alignContent: 'center',
+        justifyContent: 'center',
+        paddingInline: Dimensions.get('window').width * 0.05,
+        paddingBlock: Dimensions.get('window').height * 0.05,
+        backgroundColor: '#61667a',
+    },
     container: {
         flexGrow: 1,
         justifyContent: 'center',
         padding: 16,
         backgroundColor: '#30343f',
+        borderRadius: 20,
     },
     titleContainer: {
-        position: 'relative',
-        top: -(Dimensions.get('window').height * 0.09),
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 30,
     },
     title: {
         fontSize: 35,
         fontWeight: 'bold',
-        marginBottom: 16,
         textAlign: 'center',
         color: 'white',
     },

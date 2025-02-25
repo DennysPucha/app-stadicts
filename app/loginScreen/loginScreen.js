@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Dimensions, TouchableOpacity, Image, ScrollView } from 'react-native';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
@@ -22,52 +22,60 @@ const LoginScreen = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.titleContainer}>
-                <Text style={styles.title}>Iniciar Sesión</Text>
-            </View>
-            <View style={styles.inputContainer}>
-                <Text style={styles.text}>Correo electrónico: </Text>
-                <Controller
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            style={styles.input}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            value={value}
+        <View style={styles.mainContainer}>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <View style={styles.container}>
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.title}>Hola de nuevo!</Text>
+                    </View>
+                    <Image
+                        source={require('../../public/img1.png')}
+                        style={{ width: 300, height: 300, resizeMode: 'contain', alignSelf: 'center', marginBottom: 20 }}
+                    />
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.text}>Correo electrónico: </Text>
+                        <Controller
+                            control={control}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <TextInput
+                                    style={styles.input}
+                                    onBlur={onBlur}
+                                    onChangeText={onChange}
+                                    value={value}
+                                />
+                            )}
+                            name="correo"
+                            defaultValue=""
                         />
-                    )}
-                    name="correo"
-                    defaultValue=""
-                />
-                {errors.correo && <Text style={styles.error}>{errors.correo.message}</Text>}
-            </View>
+                        {errors.correo && <Text style={styles.error}>{errors.correo.message}</Text>}
+                    </View>
 
-            <View style={styles.inputContainer}>
-                <Text style={styles.text}>Clave: </Text>
-                <Controller
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            style={styles.input}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            value={value}
-                            secureTextEntry
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.text}>Clave: </Text>
+                        <Controller
+                            control={control}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <TextInput
+                                    style={styles.input}
+                                    onBlur={onBlur}
+                                    onChangeText={onChange}
+                                    value={value}
+                                    secureTextEntry
+                                />
+                            )}
+                            name="clave"
+                            defaultValue=""
                         />
-                    )}
-                    name="clave"
-                    defaultValue=""
-                />
-                {errors.clave && <Text style={styles.error}>{errors.clave.message}</Text>}
-            </View>
-            <View style={{ marginTop: 20 }}>
-                <MyButton title="Iniciar sesión" onPress={handleSubmit(onSubmit)} />
-                <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                    <Text style={styles.linkText}>¿Aún no te registras? Regístrate aquí</Text>
-                </TouchableOpacity>
-            </View>
+                        {errors.clave && <Text style={styles.error}>{errors.clave.message}</Text>}
+                    </View>
+                    <View style={{ marginTop: 20 }}>
+                        <MyButton title="Iniciar sesión" onPress={handleSubmit(onSubmit)} />
+                        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                            <Text style={styles.linkText}>¿Aún no tienes una cuenta?  Regístrate aquí</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </ScrollView>
         </View>
     );
 };
@@ -78,10 +86,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 16,
         backgroundColor: '#30343f',
+        borderRadius: 20,
     },
     titleContainer: {
         position: 'relative',
-        top: -(height * 0.1),
+        top: -(height * 0.01),
     },
     title: {
         fontSize: 35,
@@ -113,6 +122,18 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 30,
         textDecorationLine: 'underline',
+    },
+    mainContainer: {
+        display: 'flex',
+        flex: 1,
+        alignContent: 'center',
+        justifyContent: 'center',
+        paddingInline: width * 0.05,
+        paddingBlock: height * 0.05,
+        backgroundColor: '#61667a',
+    },
+    scrollContainer: {
+        flexGrow: 1
     },
 });
 
