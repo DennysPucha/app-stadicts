@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import moment from 'moment';
-import 'moment/locale/es'; // Español
+import 'moment/locale/es';
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
 const CustomCalendar = () => {
     const [selectedDate, setSelectedDate] = useState(moment());
+    const navigation = useNavigation();
 
     const daysInMonth = Array.from({ length: selectedDate.daysInMonth() }, (_, i) =>
         selectedDate.clone().startOf('month').add(i, 'days')
@@ -17,7 +19,9 @@ const CustomCalendar = () => {
     const handleDayPress = (day) => {
         console.log('Día seleccionado:', day.format('YYYY-MM-DD'));
         setSelectedDate(day);
+        navigation.navigate('Training', { date: day.format('YYYY-MM-DD') });
     };
+    
 
     return (
         <View style={styles.mainContainer}>

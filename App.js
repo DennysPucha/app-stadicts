@@ -5,6 +5,9 @@ import LoginScreen from './app/loginScreen/loginScreen';
 import RegisterScreen from './app/registerScreen/registerScreen';
 import SplashScreen from './app/components/SplashScreen';
 import HomeScreen from './app/homeScreen/homeScreen';
+import TrainingScreen from './app/trainingScreen.js/trainerScreen';
+import ExcerciseScreen from './app/exerciseScreen/exerciseScreen';
+import SerieScreen from './app/serieScreen/serieScreen';
 
 const Stack = createStackNavigator();
 
@@ -32,6 +35,22 @@ export default function App() {
           component={HomeScreen}
           options={{headerShown: false}}
         />
+        <Stack.Screen
+          name="Training"
+          component={TrainingScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Exercise"
+          component={ExcerciseScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Serie"
+          component={SerieScreen}
+          options={{headerShown: false}}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
