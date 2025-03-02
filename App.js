@@ -5,12 +5,13 @@ import LoginScreen from './app/loginScreen/loginScreen';
 import RegisterScreen from './app/registerScreen/registerScreen';
 import SplashScreen from './app/components/SplashScreen';
 import HomeScreen from './app/homeScreen/homeScreen';
+
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Splash">
+      <Stack.Navigator initialRouteName="Login">
         <Stack.Screen
           name="Splash"
           component={SplashScreen}

@@ -1,12 +1,17 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Dimensions, Image } from 'react-native';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
 import MyButton from '../components/MyButton';
 import { register } from '../access/methods';
+import CustomMessage from '../components/MessageCustom';
 
 const RegisterScreen = ({ navigation }) => {
+    const [message, setMessage] = useState(null);
+    const [messageType, setMessageType] = useState(null);
+    const [messageDescription, setMessageDescription] = useState(null);
+
     const registerSchema = Yup.object().shape({
         nombres: Yup.string().required('Los nombres son requeridos'),
         apellidos: Yup.string().required('Los apellidos son requeridos'),
@@ -23,35 +28,58 @@ const RegisterScreen = ({ navigation }) => {
     });
 
     const onSubmit = (data) => {
-        const submit_data=
-            {
-                "user": {
-                    "nombres": data.nombres,
-                    "apellidos": data.apellidos,
-                },
-                "cuenta": {
-                    "correo": data.correo,
-                    "clave": data.clave
-                }
+        const submit_data = {
+            "user": {
+                "nombres": data.nombres,
+                "apellidos": data.apellidos,
+            },
+            "cuenta": {
+                "correo": data.correo,
+                "clave": data.clave
             }
-        
+        };
+
         register(submit_data).then((response) => {
             if (response.code === 201) {
-                alert('Usuario registrado correctamente');
-                navigation.navigate('Login');
+                setMessage('¡Registro exitoso!');
+                setMessageType('success');
+                setMessageDescription('Bienvenido a nuestra aplicación.');
+                setTimeout(() => {
+                    navigation.navigate('Login');
+                }, 1500);
             } else {
-                alert('Error al registrar usuario');
+                setMessage('Error');
+                setMessageType('danger');
+                setMessageDescription(response.detail || 'Por favor, intenta nuevamente.');
             }
         });
     };
 
+    const handleDismiss = () => {
+        setMessage(null);
+        setMessageType(null);
+        setMessageDescription(null);
+    };
+    
+
     return (
         <View style={styles.mainContainer}>
+            {message && (
+                <CustomMessage
+                    message={message}
+                    description={messageDescription}
+                    type={messageType}
+                    onDismiss={handleDismiss}
+                />
+            )}
+            <View>
+                <Text style={{ color: 'white', textAlign: 'center', fontSize: 40, marginBottom: 15, fontWeight: 'bold' }}>Registrate Aquí!</Text>
+            </View>
             <ScrollView contentContainerStyle={styles.container}>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.title}>Registrate Aquí!</Text>
-                </View>
-
+                <Image
+                    source={require('../../public/img2.png')}
+                    style={{ width: 150, height: 150, resizeMode: 'contain', alignSelf: 'center', marginBottom: 20 }}
+                />
                 <View style={styles.inputContainer}>
                     <Text style={styles.text}>Nombres:</Text>
                     <Controller
@@ -143,9 +171,8 @@ const styles = StyleSheet.create({
         flex: 1,
         alignContent: 'center',
         justifyContent: 'center',
-        paddingInline: Dimensions.get('window').width * 0.05,
-        paddingBlock: Dimensions.get('window').height * 0.05,
-        backgroundColor: '#61667a',
+        paddingTop: Dimensions.get('window').width * 0.1,
+        backgroundColor: '#21253b',
     },
     container: {
         flexGrow: 1,
@@ -158,13 +185,13 @@ const styles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 30,
     },
     title: {
-        fontSize: 35,
+        fontSize: 20,
         fontWeight: 'bold',
         textAlign: 'center',
         color: 'white',
+        marginBottom: 70,
     },
     input: {
         height: 50,

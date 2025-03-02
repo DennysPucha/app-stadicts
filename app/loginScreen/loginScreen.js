@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Dimensions, TouchableOpacity, Image, ScrollView } from 'react-native';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -6,9 +6,23 @@ import { useForm, Controller } from 'react-hook-form';
 import MyButton from '../components/MyButton';
 import { login } from '../access/methods';
 import { storeSession } from '../access/session';
+import CustomMessage from '../components/MessageCustom';
+
 export const { width, height } = Dimensions.get('window');
 
 const LoginScreen = ({ navigation }) => {
+    const [message, setMessage] = useState(null);
+    const [messageType, setMessageType] = useState(null);
+    const [messageDescription, setMessageDescription] = useState(null);
+
+
+    const handleDismiss = () => {
+        setMessage(null);
+        setMessageType(null);
+        setMessageDescription(null);
+    };
+    
+
     const loginSchema = Yup.object().shape({
         correo: Yup.string().email("Ingrese un correo válido").required("El correo es requerido"),
         clave: Yup.string().required("La clave es requerida"),
@@ -22,19 +36,32 @@ const LoginScreen = ({ navigation }) => {
         await login(data.correo, data.clave).then((response) => {
             if (response.code === 200) {
                 storeSession(response.data.access_token).then(() => {
-                    console.log('Sesión guardada');
-                    alert('Inicio de sesión correcto');
-                    navigation.replace('Home');
+                    setMessage('¡Inicio de sesión exitoso!');
+                    setMessageType('success');
+                    setMessageDescription('Bienvenido a nuestra aplicación.');
+                    setTimeout(() => {
+                        navigation.navigate('Home');
+                    }, 1500);
                 });
-                
             } else {
-                alert('Correo o clave incorrectos');
+                setMessage('Error');
+                setMessageType('danger');
+                setMessageDescription(response.detail || 'Por favor, intenta nuevamente.');
             }
         });
     };
 
     return (
         <View style={styles.mainContainer}>
+            {message && (
+                <CustomMessage
+                    message={message}
+                    description={messageDescription}
+                    type={messageType}
+                    onDismiss={handleDismiss}
+                />
+            )}
+            <Text style={{ color: 'white', textAlign: 'center', fontSize: 40, marginBottom: 15, fontWeight: 'bold' }}>Inicia Sesión</Text>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.container}>
                     <View style={styles.titleContainer}>
@@ -105,7 +132,7 @@ const styles = StyleSheet.create({
         top: -(height * 0.01),
     },
     title: {
-        fontSize: 35,
+        fontSize: 25,
         fontWeight: 'bold',
         marginBottom: 16,
         textAlign: 'center',
@@ -140,9 +167,8 @@ const styles = StyleSheet.create({
         flex: 1,
         alignContent: 'center',
         justifyContent: 'center',
-        paddingInline: width * 0.05,
-        paddingBlock: height * 0.05,
-        backgroundColor: '#61667a',
+        paddingTop: width * 0.1,
+        backgroundColor: '#21253b',
     },
     scrollContainer: {
         flexGrow: 1

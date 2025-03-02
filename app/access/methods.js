@@ -1,4 +1,6 @@
-export const URL_API = "http://192.168.3.171:8000"
+const URL_API = 'http://192.168.3.171:8000'
+
+const INTERNAL_CODE= "hash110058."
 
 export async function login(correo, clave) {
     const response = await fetch(`${URL_API}/cuentas/login`, {
@@ -69,11 +71,12 @@ export async function DELETE(recurso, token = ''){
 }
 
 export async function verify_jwt(token){
-    const response = await fetch(`${URL_API}/verify?token=${token}`, {
+    const response = await fetch(`${URL_API}/verify`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
+        body: JSON.stringify({ token: token, internal_code: INTERNAL_CODE })
     });
     return response.json();
 }
