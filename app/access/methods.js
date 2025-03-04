@@ -29,7 +29,7 @@ export async function GET(recurso, token = ''){
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Bearer': token,
+            'Authorization': `Bearer ${token}`,
         },
     });
     return response.json();
@@ -40,7 +40,7 @@ export async function POST(recurso, token = '', data){
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Bearer': token,
+            'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(data),
     });
@@ -52,7 +52,7 @@ export async function PUT(recurso, token = '', data){
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'Bearer': token,
+            'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(data),
     });
@@ -64,7 +64,7 @@ export async function DELETE(recurso, token = ''){
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'Bearer': token,
+            'Authorization': `Bearer ${token}`,
         },
     });
     return response.json();

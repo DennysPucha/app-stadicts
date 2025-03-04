@@ -1,9 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
-const TrainingCard = ({ title, description, iconPath, number, onPress }) => {
+const TrainingCard = ({ title, description, iconPath, number, onPress, onLongPress, rightIcon }) => {
     return (
-        <TouchableOpacity onPress={onPress} style={styles.card}>
+        <TouchableOpacity
+            onPress={onPress}
+            onLongPress={onLongPress}
+            style={styles.card}
+        >
             {iconPath && (
                 <View style={styles.iconContainer}>
                     <Image source={iconPath} style={styles.icon} />
@@ -14,6 +18,7 @@ const TrainingCard = ({ title, description, iconPath, number, onPress }) => {
                 {description && <Text style={styles.description}>{description}</Text>}
             </View>
             {number && <Text style={styles.number}>{number}</Text>}
+            {rightIcon && <View style={styles.rightIconContainer}>{rightIcon}</View>}
         </TouchableOpacity>
     );
 };
@@ -50,6 +55,9 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#bb86fc',
+    },
+    rightIconContainer: {
+        marginLeft: 16,
     },
 });
 

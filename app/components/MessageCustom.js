@@ -5,19 +5,28 @@ const CustomMessage = ({ message, description, type = 'success', duration = 3000
     const [slideAnim] = useState(new Animated.Value(-50));
 
     useEffect(() => {
-        Animated.sequence([
-            Animated.timing(slideAnim, {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: true,
-            }),
-            Animated.timing(slideAnim, {
-                toValue: -50,
-                duration: 500,
-                delay: duration,
-                useNativeDriver: true,
-            }),
-        ]).start(() => onDismiss && onDismiss());
+        const showAnimation = Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+        });
+
+        const hideAnimation = Animated.timing(slideAnim, {
+            toValue: -50,
+            duration: 500,
+            useNativeDriver: true,
+        });
+
+        showAnimation.start(() => {
+            setTimeout(() => {
+                hideAnimation.start(() => {
+                    if (onDismiss) {
+                        onDismiss();
+                    }
+                });
+            }, duration); // Espera `duration` antes de iniciar la animación de salida
+        });
+
     }, [slideAnim, duration, onDismiss]);
 
     const backgroundColor = type === 'success' ? '#222' : '#D32F2F';

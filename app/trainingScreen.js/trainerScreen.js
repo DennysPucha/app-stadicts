@@ -1,33 +1,92 @@
-import React, {useState} from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
 import TrainingCard from '../components/TrainingCard';
 import { Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AddTrainingForm from '../components/forms/AddTrainingForm';
 import MyButton from '../components/MyButton';
 import CustomModal from '../components/CustomModal';
+import { useGetTrainersMyUser, PostTraining, DeleteTraining } from '../access/hooks/trainers';
+import { getUserData } from '../access/session';
+import CustomMessage from '../components/MessageCustom';
+import LoadingIndicator from '../components/loadingIndicator';
 
 const TrainingScreen = ({ route }) => {
     const { date } = route.params;
     const navigation = useNavigation();
     const [modalVisible, setModalVisible] = useState(false);
+    const [message, setMessage] = useState(null);
 
-
-    const trainings = [
-        { id: '1', title: 'Pecho', description: 'Dia básico de pecho'},
-        { id: '2', title: 'Espalda', description: 'Dia básico de espalda'},
-        { id: '3', title: 'Piernas', description: 'Dia básico de piernas'},
-        { id: '4', title: 'Hombros', description: 'Dia básico de hombros'},
-        { id: '5', title: 'Biceps', description: 'Dia básico de biceps'},
-        { id: '6', title: 'Triceps', description: 'Dia básico de triceps'},
-        { id: '7', title: 'Cardio', description: 'Dia básico de cardio'},
-        { id: '8', title: 'Abdomen', description: 'Dia básico de abdomen'},
-        { id: '9', title: 'Full Body', description: 'Dia básico de full body'},
-        { id: '10', title: 'Gluteos', description: 'Dia básico de gluteos'},
-    ];
+    const { trainings, loading, refetch } = useGetTrainersMyUser(date);
 
     function handlePress(item) {
-        navigation.navigate('Exercise', { title: item.title });
+        navigation.navigate('Exercise', { item: item });
+    }
+
+    const onSubmit = async (item) => {
+        const user = await getUserData();
+        const data = {
+            nombre: item.nombre,
+            descripcion: item.descripcion,
+            fecha: date,
+            user_id: user.id
+        };
+        const response = await PostTraining(data);
+        setModalVisible(false);
+        setTimeout(() => {
+            if (response.code === 201) {
+                refetch();
+                setMessage({
+                    message: 'Entrenamiento creado',
+                    description: 'El entrenamiento se ha creado correctamente',
+                    type: 'success',
+                });
+            } else {
+                setMessage({
+                    message: 'Error al crear entrenamiento',
+                    description: 'Ha ocurrido un error al crear el entrenamiento',
+                    type: 'error'
+                });
+            }
+        }, 200);
+    };
+
+    const handleDelete = async (external_id) => {
+        Alert.alert(
+            'Eliminar Entrenamiento',
+            '¿Estás seguro de que deseas eliminar este entrenamiento?',
+            [
+                {
+                    text: 'Cancelar',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Eliminar',
+                    onPress: async () => {
+                        const response = await DeleteTraining(external_id);
+                        if (response.code === 200) {
+                            setMessage({
+                                message: 'Entrenamiento eliminado',
+                                description: 'El entrenamiento se ha eliminado correctamente',
+                                type: 'success',
+                            });
+                            refetch();
+                        } else {
+                            setMessage({
+                                message: 'Error al eliminar entrenamiento',
+                                description: 'Ha ocurrido un error al eliminar el entrenamiento',
+                                type: 'error',
+                            });
+                        }
+                    },
+                },
+            ],
+            { cancelable: true }
+        );
+    };
+
+    if (loading) {
+        return <LoadingIndicator />;
     }
 
     return (
@@ -41,45 +100,50 @@ const TrainingScreen = ({ route }) => {
             </View>
             <FlatList
                 data={trainings}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item, index }) => (
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
                     <TrainingCard
-                        title={item.title}
-                        description={item.description}
-                        number="0"
+                        title={item.nombre}
+                        description={item.descripcion}
                         iconPath={require('../../public/img2.png')}
                         onPress={() => handlePress(item)}
+                        onLongPress={() => handleDelete(item.external_id)}
                     />
                 )}
                 contentContainerStyle={styles.container}
                 style={{ marginTop: 20 }}
             />
             <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
-                <AddTrainingForm />
+                <AddTrainingForm onSubmit={onSubmit} />
             </CustomModal>
+
+            {message && (
+                <CustomMessage
+                    message={message.message}
+                    description={message.description}
+                    type={message.type}
+                    duration={5000}
+                    onDismiss={() => setMessage(null)}
+                />
+            )}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     mainContainer: {
-        display: 'flex',
         flex: 1,
-        alignContent: 'center',
         justifyContent: 'center',
         paddingTop: Dimensions.get('window').width * 0.1,
         backgroundColor: '#21253b',
     },
     container: {
         flexGrow: 1,
-        justifyContent: 'center',
         padding: 16,
         backgroundColor: '#30343f',
         borderRadius: 20,
     },
-
     titleContainer: {
-        display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 25,

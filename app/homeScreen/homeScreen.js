@@ -1,18 +1,41 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions, Image, BackHandler, Alert } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment';
 import 'moment/locale/es';
 import { useNavigation } from '@react-navigation/native';
+import CustomMessage from '../components/MessageCustom';
 
 const { width, height } = Dimensions.get('window');
 
 const CustomCalendar = () => {
     const [selectedDate, setSelectedDate] = useState(moment());
+    const [showMessage, setShowMessage] = useState(false);
     const navigation = useNavigation();
 
     const daysInMonth = Array.from({ length: selectedDate.daysInMonth() }, (_, i) =>
         selectedDate.clone().startOf('month').add(i, 'days')
     );
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = () => {
+                Alert.alert(
+                    "Cerrar Sesión",
+                    "¿Estás seguro de que quieres cerrar sesión?",
+                    [
+                        { text: "Cancelar", style: "cancel" },
+                        { text: "Sí", onPress: () => navigation.navigate('Login') }
+                    ]
+                );
+                return true;
+            };
+
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+            return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+        }, [navigation])
+    );
+
 
     const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
@@ -25,13 +48,26 @@ const CustomCalendar = () => {
 
     return (
         <View style={styles.mainContainer}>
+             {showMessage && (
+                <CustomMessage
+                    message="Saliendo..."
+                    description="Has cerrado sesión"
+                    type="error"
+                    duration={3000}
+                    onDismiss={() => setShowMessage(false)}
+                />
+            )}
             <View style={styles.titleContainer}>
                 <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.settingsButton}>
-                    <Text style={styles.settingsText}>⚙️</Text>
+                    <Image source={require('../../public/settings.png')} style={{ width: 30, height: 30 }} />
                 </TouchableOpacity>
                 <Text style={styles.title}>Días de Entrenamiento</Text>
-
             </View>
+
+            <Image
+                source={require('../../public/img3.png')}
+                style={{ width: 150, height: 150, resizeMode: 'contain', alignSelf: 'center', marginBottom: 20 }}
+            />
             <View style={styles.container}>
 
                 {/* Mes y botones de navegación */}

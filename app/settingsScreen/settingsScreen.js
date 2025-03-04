@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#30343f',
         paddingVertical: 20,
         paddingHorizontal: 10,
+        paddingTop: 40,
     },
     menuTitle: {
         color: 'white',
@@ -77,6 +78,7 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         padding: 20,
+        paddingTop: 40,
     },
     title: {
         fontSize: 20,
