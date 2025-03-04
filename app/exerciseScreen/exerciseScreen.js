@@ -1,12 +1,16 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import TrainingCard from '../components/TrainingCard';
 import { Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AddExerciseForm from '../components/forms/AddExerciseForm';
+import MyButton from '../components/MyButton';
+import CustomModal from '../components/CustomModal';
 
 const ExcerciseScreen = ({ route }) => {
     const { title } = route.params;
     const navigation = useNavigation();
+    const [modalVisible, setModalVisible] = useState(false);
 
     const exercises = [
         { id: '1', title: 'Press Militar'},
@@ -15,6 +19,10 @@ const ExcerciseScreen = ({ route }) => {
         { id: '4', title: 'Peso Muerto'},
         { id: '5', title: 'Dominadas'},
         { id: '6', title: 'Fondos'},
+        { id: '7', title: 'Curl de Biceps'},
+        { id: '8', title: 'Extension de Triceps'},
+        { id: '9', title: 'Prensa de Piernas'},
+        { id: '10', title: 'Elevaciones Laterales'},
     ];
 
     function handlePress(item) {
@@ -25,22 +33,28 @@ const ExcerciseScreen = ({ route }) => {
         <View style={styles.mainContainer}>
             <View style={styles.titleContainer}>
                 <Text style={styles.title}>Ejercicios de:</Text>
-                <Text style={{fontSize:15, color: 'white'}}>{title}</Text>
+                <Text style={{ fontSize: 15, color: 'white' }}>{title}</Text>
             </View>
-            <View style={styles.container}>
-
-                <FlatList
-                    data={exercises}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <TrainingCard
-                            title={item.title}
-                            iconPath={require('../../public/img1.png')}
-                            onPress={() => handlePress(item)}
-                        />
-                    )}
-                />
+            <View style={{ paddingHorizontal: 20 }}>
+                <MyButton title="Agregar ejercicio" onPress={() => setModalVisible(true)} />
             </View>
+            <FlatList
+                data={exercises}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item, index }) => (
+                    <TrainingCard
+                        title={item.title}
+                        number="0"
+                        iconPath={require('../../public/img2.png')}
+                        onPress={() => handlePress(item)}
+                    />
+                )}
+                contentContainerStyle={styles.container}
+                style={{ marginTop: 20 }}
+            />
+            <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
+                <AddExerciseForm />
+            </CustomModal>
         </View>
     );
 };
@@ -56,7 +70,6 @@ const styles = StyleSheet.create({
     },
     container: {
         flexGrow: 1,
-        justifyContent: 'center',
         padding: 16,
         backgroundColor: '#30343f',
         borderRadius: 20,

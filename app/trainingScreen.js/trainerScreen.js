@@ -1,12 +1,16 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import TrainingCard from '../components/TrainingCard';
 import { Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AddTrainingForm from '../components/forms/AddTrainingForm';
+import MyButton from '../components/MyButton';
+import CustomModal from '../components/CustomModal';
 
 const TrainingScreen = ({ route }) => {
     const { date } = route.params;
     const navigation = useNavigation();
+    const [modalVisible, setModalVisible] = useState(false);
 
 
     const trainings = [
@@ -16,6 +20,10 @@ const TrainingScreen = ({ route }) => {
         { id: '4', title: 'Hombros', description: 'Dia básico de hombros'},
         { id: '5', title: 'Biceps', description: 'Dia básico de biceps'},
         { id: '6', title: 'Triceps', description: 'Dia básico de triceps'},
+        { id: '7', title: 'Cardio', description: 'Dia básico de cardio'},
+        { id: '8', title: 'Abdomen', description: 'Dia básico de abdomen'},
+        { id: '9', title: 'Full Body', description: 'Dia básico de full body'},
+        { id: '10', title: 'Gluteos', description: 'Dia básico de gluteos'},
     ];
 
     function handlePress(item) {
@@ -25,24 +33,30 @@ const TrainingScreen = ({ route }) => {
     return (
         <View style={styles.mainContainer}>
             <View style={styles.titleContainer}>
-                <Text style={styles.title}>Entrenamientos del día</Text>
-                <Text style={{fontSize:15, color: 'white'}}>{date}</Text>
+                <Text style={styles.title}>Entrenamientos del:</Text>
+                <Text style={{ fontSize: 15, color: 'white' }}>{date}</Text>
             </View>
-            <View style={styles.container}>
-
-                <FlatList
-                    data={trainings}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <TrainingCard
-                            title={item.title}
-                            description={item.description}
-                            iconPath={require('../../public/img1.png')}
-                            onPress={() => handlePress(item)}
-                        />
-                    )}
-                />
+            <View style={{ paddingHorizontal: 20 }}>
+                <MyButton title="Agregar entrenamiento" onPress={() => setModalVisible(true)} />
             </View>
+            <FlatList
+                data={trainings}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item, index }) => (
+                    <TrainingCard
+                        title={item.title}
+                        description={item.description}
+                        number="0"
+                        iconPath={require('../../public/img2.png')}
+                        onPress={() => handlePress(item)}
+                    />
+                )}
+                contentContainerStyle={styles.container}
+                style={{ marginTop: 20 }}
+            />
+            <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
+                <AddTrainingForm />
+            </CustomModal>
         </View>
     );
 };

@@ -21,12 +21,16 @@ const CustomCalendar = () => {
         setSelectedDate(day);
         navigation.navigate('Training', { date: day.format('YYYY-MM-DD') });
     };
-    
+
 
     return (
         <View style={styles.mainContainer}>
             <View style={styles.titleContainer}>
+                <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.settingsButton}>
+                    <Text style={styles.settingsText}>⚙️</Text>
+                </TouchableOpacity>
                 <Text style={styles.title}>Días de Entrenamiento</Text>
+
             </View>
             <View style={styles.container}>
 
@@ -98,7 +102,7 @@ const styles = StyleSheet.create({
         marginBottom: 18,
     },
     title: {
-        fontSize:32,
+        fontSize: 32,
         fontWeight: 'bold',
         marginBottom: 16,
         textAlign: 'center',
@@ -154,6 +158,16 @@ const styles = StyleSheet.create({
     selectedDayText: {
         color: '#000000',
         fontWeight: 'bold',
+    },
+    settingsButton: {
+        display: 'flex',
+        alignItems: 'flex-end',
+        alignSelf: 'flex-end',
+        marginRight: 10,
+    },
+    settingsText: {
+        fontSize: 24,
+        color: 'white',
     },
 });
 

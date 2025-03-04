@@ -8,6 +8,7 @@ import HomeScreen from './app/homeScreen/homeScreen';
 import TrainingScreen from './app/trainingScreen.js/trainerScreen';
 import ExcerciseScreen from './app/exerciseScreen/exerciseScreen';
 import SerieScreen from './app/serieScreen/serieScreen';
+import SettingsScreen from './app/settingsScreen/settingsScreen';
 
 const Stack = createStackNavigator();
 
@@ -48,6 +49,11 @@ export default function App() {
         <Stack.Screen
           name="Serie"
           component={SerieScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
           options={{headerShown: false}}
         />
 
