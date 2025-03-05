@@ -9,6 +9,7 @@ import CustomModal from '../components/CustomModal';
 import { useGetExercicesMyTrain, PostExercice, DeleteExercice } from '../access/hooks/exercices';
 import CustomMessage from '../components/MessageCustom';
 import LoadingIndicator from '../components/loadingIndicator';
+import FloatingBackButton from '../components/FloatingBackButton';
 
 const ExcerciseScreen = ({ route }) => {
     const { item: train } = route.params;
@@ -26,6 +27,7 @@ const ExcerciseScreen = ({ route }) => {
     const onSubmit = async (item) => {
         const data = {
             nombre: item.nombre,
+            is_copy: false,
             entrenamiento_id: train.id
         };
         const response = await PostExercice(data);
@@ -91,6 +93,7 @@ const ExcerciseScreen = ({ route }) => {
 
     return (
         <View style={styles.mainContainer}>
+            <FloatingBackButton />
             <View style={styles.titleContainer}>
                 <Text style={styles.title}>Ejercicios de:</Text>
                 <Text style={{ fontSize: 15, color: 'white' }}>{train.nombre}</Text>
@@ -104,7 +107,7 @@ const ExcerciseScreen = ({ route }) => {
                 renderItem={({ item, index }) => (
                     <TrainingCard
                         title={item.nombre}
-                        iconPath={require('../../public/img2.png')}
+                        iconPath={require('../../public/exercise.png')}
                         onPress={() => handlePress(item)}
                         onLongPress={() => handleDelete(item.external_id)}
                     />

@@ -41,3 +41,9 @@ export async function DeleteTraining(external_id){
     const response = await DELETE(`entrenamientos/${external_id}`, token);
     return response;
 }
+
+export async function CopyTraining(id, fecha){
+    const token = await getToken();
+    const response = await POST(`entrenamientos/copy/${id}?fecha=${fecha}`, token);
+    return response;
+}

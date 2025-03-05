@@ -7,6 +7,7 @@ import AddSerieForm from '../components/forms/AddSerieForm';
 import { useGetSeriesByExercise, PostSerie, DeleteSerie } from '../access/hooks/series';
 import CustomMessage from '../components/MessageCustom';
 import LoadingIndicator from '../components/loadingIndicator';
+import FloatingBackButton from '../components/FloatingBackButton';
 
 const SerieScreen = ({ route }) => {
     const { item: exercise } = route.params;
@@ -15,11 +16,16 @@ const SerieScreen = ({ route }) => {
 
     const { series, loading, refetch } = useGetSeriesByExercise(exercise.id);
 
+    // Filtrar las series en dos listas
+    const copiedSeries = series.filter((item) => item.is_copy === true);
+    const newSeries = series.filter((item) => !item.is_copy);
+
     const onSubmit = async (item) => {
         const data = {
             peso: item.peso,
             repeticiones: item.repeticiones,
             unidad_peso: item.unidad_peso,
+            is_copy: false,
             ejercicio_id: exercise.id
         };
         const response = await PostSerie(data);
@@ -80,64 +86,82 @@ const SerieScreen = ({ route }) => {
         return <LoadingIndicator />;
     }
 
-    return (
-        <View style={styles.mainContainer}>
-            <View style={styles.titleContainer}>
-                <Text style={styles.title}>Series de:</Text>
-                <Text style={{ fontSize: 15, color: 'white' }}>{exercise.nombre}</Text>
-            </View>
-            <View style={{ paddingHorizontal: 20 }}>
-                <MyButton title="Agregar serie" onPress={() => setModalVisible(true)} />
-            </View>
+    const renderSection = (title, data) => (
+        <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>{title}</Text>
             <FlatList
-                data={series}
+                data={data}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item, index }) => (
                     <TrainingCard
                         title={`${index + 1} Serie`}
                         description={`${item.peso} ${item.unidad_peso}`}
                         number={item.repeticiones}
-                        iconPath={require('../../public/img2.png')}
+                        iconPath={require('../../public/repeat.png')}
                         onLongPress={() => handleDelete(item.external_id)}
+                        isCopy={item.is_copy}
                     />
                 )}
-                contentContainerStyle={styles.container}
-                style={{ marginTop: 20 }}
+                contentContainerStyle={styles.listContainer}
             />
-            <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
-                <AddSerieForm onSubmit={onSubmit} />
-            </CustomModal>
-            {message && (
-                <CustomMessage
-                    message={message.message}
-                    description={message.description}
-                    type={message.type}
-                    duration={3000}
-                    onDismiss={() => setMessage(null)}
-                />
-            )}
+        </View>
+    );
+
+    return (
+        <View style={{ flex: 1 }}>
+            <FloatingBackButton />
+            <FlatList
+                contentContainerStyle={styles.scrollViewContainer}
+                data={[]}
+                keyExtractor={() => 'root'}
+                renderItem={null}
+                ListHeaderComponent={
+                    <View style={styles.mainContainer}>
+                        <View style={styles.titleContainer}>
+                            <Text style={styles.title}>Series de:</Text>
+                            <Text style={{ fontSize: 15, color: 'white' }}>{exercise.nombre}</Text>
+                        </View>
+                        <View style={{ paddingHorizontal: 20 }}>
+                            <MyButton title="Agregar serie" onPress={() => setModalVisible(true)} />
+                        </View>
+
+                        {/* Lista de series copiadas (Meta Pasada) */}
+                        {copiedSeries.length > 0 && renderSection('Meta Pasada', copiedSeries)}
+
+                        {/* Lista de series nuevas */}
+                        {renderSection('Nuevas Series', newSeries)}
+
+                        <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
+                            <AddSerieForm onSubmit={onSubmit} />
+                        </CustomModal>
+                        {message && (
+                            <CustomMessage
+                                message={message.message}
+                                description={message.description}
+                                type={message.type}
+                                duration={3000}
+                                onDismiss={() => setMessage(null)}
+                            />
+                        )}
+                    </View>
+                }
+            />
         </View>
     );
 };
 
 const styles = StyleSheet.create({
+    scrollViewContainer: {
+        flexGrow: 1,
+        paddingInline: 16,
+        backgroundColor: '#21253b',
+    },
     mainContainer: {
-        display: 'flex',
         flex: 1,
-        alignContent: 'center',
-        justifyContent: 'center',
         paddingTop: Dimensions.get('window').width * 0.1,
         backgroundColor: '#21253b',
     },
-    container: {
-        flexGrow: 1,
-        padding: 16,
-        backgroundColor: '#30343f',
-        borderRadius: 20,
-        paddingBottom: 25,
-    },
     titleContainer: {
-        display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 25,
@@ -148,6 +172,23 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         color: 'white',
+    },
+    sectionContainer: {
+        marginTop: 20,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#bb86fc',
+        marginLeft: 16,
+        marginBottom: 8,
+    },
+    listContainer: {
+        flexGrow: 1,
+        padding: 16,
+        backgroundColor: '#30343f',
+        borderRadius: 20,
+        paddingBottom: 25,
     },
     deleteIcon: {
         width: 24,
