@@ -1,4 +1,4 @@
-const URL_API = 'http://192.168.3.171:8000'
+const URL_API = 'https://api-stadicts.onrender.com'
 
 const INTERNAL_CODE= "hash110058."
 

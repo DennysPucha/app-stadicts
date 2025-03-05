@@ -1,45 +1,186 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
-// import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import * as Yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import CustomMessage from '../components/MessageCustom';
+import { PostChangeUser } from '../access/hooks/user';
+import { getUserData } from '../access/session';
+
+const schema = Yup.object().shape({
+    correo: Yup.string().email('Correo inválido').required('El correo es requerido'),
+    clave: Yup.string().required('La clave actual es requerida'),
+    nuevaClave: Yup.string()
+        .min(8, 'La nueva clave debe tener al menos 8 caracteres')
+        .required('La nueva clave es requerida'),
+    confirmarClave: Yup.string()
+        .oneOf([Yup.ref('nuevaClave'), null], 'Las contraseñas no coinciden')
+        .required('Confirmar clave es requerida'),
+});
 
 const SettingsScreen = ({ navigation }) => {
-    const [correo, setCorreo] = useState("dennys@gmail.com");
-    const [clave, setClave] = useState("123456789");
-    const [nuevaClave, setNuevaClave] = useState("");
-    const [confirmarClave, setConfirmarClave] = useState("");
 
-    const handleSave = () => {
-        if (nuevaClave !== confirmarClave) {
-            alert("Las contraseñas no coinciden");
-            return;
+    const [userData, setUserData] = useState({});
+    const [activeSection, setActiveSection] = useState('perfil');
+    const [message, setMessage] = useState(null);
+
+    const { control, handleSubmit, formState: { errors }, reset } = useForm({
+        resolver: yupResolver(schema),
+        defaultValues: {
+            correo: '',
         }
-        alert("Configuración guardada correctamente");
+    });
+
+    useEffect(() => {
+        getUserData().then((data) => {
+            if (data) {
+                setUserData(data);
+                reset({correo: data.correo});
+            }
+        }).catch((err) => console.error("Error al obtener datos del usuario:", err));
+    }, []);
+
+    
+
+    const onSubmit = async (data) => {
+        try {
+            const submitData = {
+                correo: data.correo,
+                clave: data.clave,
+                nueva_clave: data.nuevaClave,
+                confirmar_clave: data.confirmarClave,
+            };
+            const response = await PostChangeUser(submitData, userData.cuenta_external_id);
+            if (response.code === 200) {
+                setMessage({
+                    type: 'success',
+                    message: 'Datos actualizados',
+                    description: 'Los datos de tu perfil han sido actualizados correctamente.',
+                });
+            } else {
+                setMessage({
+                    type: 'error',
+                    message: response.detail || 'Error al actualizar',
+                    description: 'Ha ocurrido un error al actualizar los datos de tu perfil.',
+                });
+            }
+        } catch (error) {
+            setMessage({
+                type: 'error',
+                message: 'Error de conexión',
+                description: 'No se pudo conectar con el servidor.',
+            });
+        }
     };
 
     return (
         <View style={styles.container}>
             <View style={styles.menu}>
                 <Text style={styles.menuTitle}>Opciones</Text>
-                <TouchableOpacity style={styles.menuItem}>
-                    {/* <Ionicons name="person-outline" size={20} color="white" /> */}
+                <TouchableOpacity style={styles.menuItem} onPress={() => setActiveSection('perfil')}>
                     <Text style={styles.menuText}>Perfil</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.menuItem} onPress={() => setActiveSection('configuracion')}>
+                    <Text style={styles.menuText}>Configuración</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Login')}>
-                    {/* <Ionicons name="log-out-outline" size={20} color="white" /> */}
                     <Text style={styles.menuText}>Cerrar sesión</Text>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.content}>
-                <Text style={styles.title}>Configuración de perfil</Text>
+                {activeSection === 'perfil' && (
+                    <View style={styles.userDataSection}>
+                        <Text style={styles.title}>Mis datos</Text>
+                        <Image
+                            source={require('../../public/user.png')}
+                            style={styles.userImage}
+                        />
+                        <Text style={styles.userDataText}>Nombre: {userData?.nombre || 'N/A'}</Text>
+                        <Text style={styles.userDataText}>Correo: {userData?.correo || 'N/A'}</Text>
+                    </View>
+                )}
 
-                <TextInput style={styles.input} value={correo} onChangeText={setCorreo} placeholder="Correo" placeholderTextColor="gray" />
-                <TextInput style={styles.input} value={clave} onChangeText={setClave} placeholder="Clave actual" placeholderTextColor="gray" secureTextEntry />
-                <TextInput style={styles.input} value={nuevaClave} onChangeText={setNuevaClave} placeholder="Nueva clave" placeholderTextColor="gray" secureTextEntry />
-                <TextInput style={styles.input} value={confirmarClave} onChangeText={setConfirmarClave} placeholder="Confirmar clave" placeholderTextColor="gray" secureTextEntry />
+                {activeSection === 'configuracion' && (
+                    <View>
+                        <Text style={styles.title}>Configuración de perfil</Text>
 
-                <Button title="Guardar cambios" onPress={handleSave} color="#4CAF50" />
+                        <Controller
+                            control={control}
+                            name="correo"
+                            render={({ field: { onChange, value } }) => (
+                                <TextInput
+                                    style={styles.input}
+                                    value={value}
+                                    onChangeText={onChange}
+                                    placeholder="Correo"
+                                    placeholderTextColor="gray"
+                                />
+                            )}
+                        />
+                        {errors.correo && <Text style={styles.errorText}>{errors.correo.message}</Text>}
+
+                        <Controller
+                            control={control}
+                            name="clave"
+                            render={({ field: { onChange, value } }) => (
+                                <TextInput
+                                    style={styles.input}
+                                    value={value}
+                                    onChangeText={onChange}
+                                    placeholder="Clave actual"
+                                    placeholderTextColor="gray"
+                                    secureTextEntry
+                                />
+                            )}
+                        />
+                        {errors.clave && <Text style={styles.errorText}>{errors.clave.message}</Text>}
+
+                        <Controller
+                            control={control}
+                            name="nuevaClave"
+                            render={({ field: { onChange, value } }) => (
+                                <TextInput
+                                    style={styles.input}
+                                    value={value}
+                                    onChangeText={onChange}
+                                    placeholder="Nueva clave"
+                                    placeholderTextColor="gray"
+                                    secureTextEntry
+                                />
+                            )}
+                        />
+                        {errors.nuevaClave && <Text style={styles.errorText}>{errors.nuevaClave.message}</Text>}
+
+                        <Controller
+                            control={control}
+                            name="confirmarClave"
+                            render={({ field: { onChange, value } }) => (
+                                <TextInput
+                                    style={styles.input}
+                                    value={value}
+                                    onChangeText={onChange}
+                                    placeholder="Confirmar clave"
+                                    placeholderTextColor="gray"
+                                    secureTextEntry
+                                />
+                            )}
+                        />
+                        {errors.confirmarClave && <Text style={styles.errorText}>{errors.confirmarClave.message}</Text>}
+
+                        <Button title="Guardar cambios" onPress={handleSubmit(onSubmit)} color="#4CAF50" />
+                    </View>
+                )}
             </View>
+
+            {message && (
+                <CustomMessage
+                    message={message.message}
+                    description={message.description}
+                    type={message.type}
+                    onDismiss={() => setMessage(null)}
+                />
+            )}
         </View>
     );
 };
@@ -51,7 +192,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#21253b',
     },
     menu: {
-        width: '30%',
+        width: '40%',
         backgroundColor: '#30343f',
         paddingVertical: 20,
         paddingHorizontal: 10,
@@ -91,6 +232,25 @@ const styles = StyleSheet.create({
         color: 'white',
         padding: 10,
         borderRadius: 5,
+        marginBottom: 10,
+    },
+    errorText: {
+        color: 'red',
+        marginBottom: 10,
+    },
+    userDataSection: {
+        alignItems: 'center',
+    },
+    userImage: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        marginBottom: 20,
+        tintColor: '#bb86fc',
+    },
+    userDataText: {
+        fontSize: 10,
+        color: 'white',
         marginBottom: 10,
     },
 });
